@@ -1,52 +1,44 @@
 #include <bits/stdc++.h>
 using namespace std;
-typedef unsigned int ui;
-typedef long long int ll;
-const int prime_cnt = 5761456;
  
-int const N = 1e8 + 10;
-int prime[prime_cnt + 5];
-bitset <N> bs;
-const int base = 1000;
-typedef pair < int,int > PII;
+#define F first
+#define S second
+#define pb push_back
+int const MX = 2e4 + 100;
+int dist[MX][12] ;
  
-vector < PII > active;
-//ui prime_mul[N/base] ;
-ui dp[prime_cnt];
- 
-void sieve()
+struct edge
 {
-    int pid =0 ;
-    bs.set();
-    bs[0] = bs[1] = 0;
-    bs[2] = 1;
-    prime[pid++] = 2;
+    int v, w, type;
+    edge() {}
+    edge(int a, int b, int c):v(a),w(b),type(c){
  
-    for(int i = 4; i < N; i += 2 )
-        bs[i] = 0;
- 
-    for(ll i = 3; i < N; i += 2)
-    {
-        if(!bs[i]) continue;
-        prime[pid++] = i;
-        for(ll j = i*i ; j < N; j += 2*i){
-            bs[j] = 0;
-        }
     }
-    int lim = 1e4 + 5;
-    for(int i = 0; i < pid; i++)
-    {
-        ll num = prime[i] ;
-        if(num > lim) continue;
  
-        while(num < N )
-        {
-            active.push_back(PII(num,prime[i]));
-            num *= prime[i];
+    bool operator<(const edge &rhs)const
+    {
+        if(w == rhs.w){
+            return v > rhs.v;
         }
+        return w > rhs.w ;
     }
-    sort(active.begin(),active.end()) ;
-}
+};
+ 
+struct dat
+{
+    int w, v, d;
+    dat(int a, int b, int c):w(a),v(b),d(c){
+ 
+    }
+ 
+    bool operator<(const dat &rhs)const{
+        if(w == rhs.w)
+            return v > rhs.v;
+        return w > rhs.w ;
+    }
+};
+ 
+vector < edge > g[MX] ;
  
 int main()
 {
@@ -54,51 +46,69 @@ int main()
         freopen("in.txt","r",stdin);
         freopen("out.txt","w",stdout);
     #endif
-    //clock_t z = clock();
  
-    int t,c = 0;
-    sieve();
- 
-    //cout << active.size() << endl;
-    //printf("Time Needed %lf\n",(double)(clock()-z)/CLOCKS_PER_SEC );
+    int t, c =0;
     cin >> t;
-    ll lim = 1e4 + 5;
-    int id = 0;
-    int offset = 0;
-    while(prime[id] <= lim) id++;
-    offset = id;
- 
-    dp[0] = prime[id++];
-    for(int i = 1; id < prime_cnt; i++,id++){
-        dp[i] = dp[i-1] * prime[id] ;
-    }
  
     while(t--)
     {
-        int n;
-        scanf("%d",&n);
-        ui ans = 1;
-        for(int i = 0; i < active.size();i++)
+ 
+        int n, m , k, d;
+        cin >> n >> m >> k >> d;
+ 
+        for(int i =0 ;i <= n; i++)
+            g[i].clear() ;
+ 
+        for(int i =0; i < MX; i++)
+            for(int j = 0; j <= 10 ; j++)
+                dist[i][j] = 1e9 ;
+ 
+        for(int i =0 ; i < m; i++)
         {
-            if(active[i].first > n)
-                break;
-            ans *= active[i].second;
-        }  
-        /*int up = upper_bound(prime,prime + prime_cnt,n) - prime;
-        cout << up << endl;
-        cout << prime[up] << endl;*/
-        if(n > lim)
-        {
-            int up = upper_bound(prime,prime + prime_cnt,n) - prime;
-            //cout << up << endl;
-            up--;
-            up -= offset;
-            if(up >= 0)
-                ans *= dp[up]; 
+            int a, b, c ;
+            scanf("%d %d %d",&a,&b,&c);
+            g[a].pb(edge(b,c,0)) ;
         }
  
-        printf("Case %d: %u\n", ++c,ans);
-    }
+        for(int i =0 ;i < k; i++){
+            int a, b, c;
+            scanf("%d %d %d",&a,&b,&c);
+            g[a].pb(edge(b,c,1));
+        }
  
+        priority_queue < dat > pq;
+        pq.push(dat(0,0,0));
+ 
+        dist[0][0] = 0 ;
+        while(!pq.empty())
+        {
+            dat top = pq.top();
+            pq.pop();
+            assert(dist[top.v][top.d] >= 0 ) ;
+            if(dist[top.v][top.d] < top.w ) continue;
+ 
+ 
+ 
+            for(int i =0 ; i < g[top.v].size(); i++){
+                edge tmp = g[top.v][i] ;
+                if(top.d + tmp.type > d ) continue;
+ 
+                //cout << dist[tmp.v] << " " << dist[top.v] + tmp.w << endl;
+ 
+                if(dist[tmp.v][top.d + tmp.type] > dist[top.v][top.d] + tmp.w){
+                    dist[tmp.v][top.d + tmp.type] = dist[top.v][top.d] + tmp.w;
+                    pq.push(dat(dist[tmp.v][top.d + tmp.type],tmp.v, tmp.type + top.d)) ;
+                }
+            }
+        }
+        int ans = 1e9 ;
+        for(int i =0 ; i <= d; i++)
+           ans = min(ans, dist[n-1][i]) ;//, dist[n-1] + d ) ;
+        if(ans >= (int)1e9 ){
+            printf("Case %d: Impossible\n",++c);
+        }else
+            printf("Case %d: %d\n",++c, ans ) ;
+    }
     return 0;
 }
+ 
