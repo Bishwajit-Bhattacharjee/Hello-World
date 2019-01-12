@@ -215,13 +215,17 @@ public:
     int search1(string key)
     {
         int id = hash1(key,n);
-        return ara[id].search(key);
+        int val = ara[id].search(key);
+        aux = ara[id].get_search_hit();
+        return val;
     }
 
     int search2(string key)
     {
         int id = hash2(key,n);
-        return ara1[id].search(key);
+        int val = ara1[id].search(key);
+        aux = ara1[id].get_search_hit();
+        return val;
     }
 
     void Delete1(string key)
@@ -294,7 +298,7 @@ public:
 
     int search1(string key)
     {
-        int i = 0;
+        long long int i = 0;
 
         while(i < n)
         {
@@ -304,6 +308,7 @@ public:
             if(ara[idx].key == key)
                 return ara[idx].val;
             i++;
+            aux = i;
         }
 
         return -INF;
@@ -311,7 +316,7 @@ public:
 
     int search2(string key)
     {
-        int i = 0;
+        long long int i = 0;
 
         while(i < n)
         {
@@ -321,6 +326,7 @@ public:
             if(ara1[idx].key == key)
                 return ara1[idx].val;
             i++;
+            aux = i;
         }
 
         return -INF;
@@ -331,7 +337,7 @@ public:
         int sval = search1(key);
         if(sval == -INF) return;
 
-        int it = 0;
+        long long int it = 0;
         while(it < n )
         {
             int idx = ( hash1(key,n) + it * aux_hash(key,n) ) % n;
@@ -342,6 +348,8 @@ public:
                 return;
             }
             it++;
+            aux = it;
+            
         }
     }
 
@@ -350,7 +358,7 @@ public:
         int sval = search2(key);
         if(sval == -INF) return;
 
-        int it = 0;
+        long long int it = 0;
         while(it < n )
         {
             int idx = ( hash2(key,n) + it * aux_hash(key,n) ) % n;
@@ -361,6 +369,7 @@ public:
                 return;
             }
             it++;
+            aux = it;
         }
 
     }
@@ -426,7 +435,7 @@ public:
 
     int search1(string key)
     {
-        int i = 0;
+        long long int i = 0;
 
         while(i < n)
         {
@@ -436,6 +445,7 @@ public:
             if(ara[idx].key == key)
                 return ara[idx].val;
             i++;
+            aux = i + 1;
         }
 
         return -INF;
@@ -443,7 +453,7 @@ public:
 
     int search2(string key)
     {
-        int i = 0;
+        long long int i = 0;
 
         while(i < n)
         {
@@ -453,6 +463,7 @@ public:
             if(ara1[idx].key == key)
                 return ara1[idx].val;
             i++;
+            aux = i + 1;
         }
 
         return -INF;
@@ -463,7 +474,7 @@ public:
         int sval = search1(key);
         if(sval == -INF) return;
 
-        int it = 0;
+        long long int it = 0;
         while(it < n )
         {
             int idx = ( hash1(key,n) + 31 * it * aux_hash(key,n) + 37 * it * it ) % n;
@@ -482,7 +493,7 @@ public:
         int sval = search2(key);
         if(sval == -INF) return;
 
-        int it = 0;
+        long long int it = 0;
         while(it < n )
         {
             int idx = ( hash2(key,n) + 31 * it * aux_hash(key,n) + 37 * it* it ) % n;
@@ -543,8 +554,35 @@ int main()
         hs2.insert2(randString[i],value[i]);
         col3 += hs2.get_aux();
     }
-    
     cout << col1 << " " << col2 << " " << col3 << endl;
+    
+    long long hit1 = 0, hit2 = 0;
+    
+    for(int i = 0; i < 1000; i++)
+    {
+        int id = rand() % sz;
+        hs.search1(randString[id]);
+        hit1 += hs.get_aux();
+        hs1.search1(randString[id]);
+        hit1 += hs1.get_aux();
+        hs2.search1(randString[id]);
+        hit1 += hs2.get_aux();
+       ///* /*
+        hs.search2(randString[id]);
+        hit2 += hs.get_aux();
+        
+        hs1.search2(randString[id]);
+        hit2 += hs1.get_aux();
+        
+        hs2.search2(randString[id]);
+        hit2 += hs2.get_aux();
+        //*/
+        //*/
+    }
+    
+    double avg_h1 = 1.0 * hit1 / 1000, avg_h2 = 1.0 * hit2 / 1000;
+    cout << avg_h1 << " " << avg_h2 << endl;
+    
     
     return 0;
 }
