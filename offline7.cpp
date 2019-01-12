@@ -514,9 +514,9 @@ int main()
 {
     srand(time(0));
     int sz = 10000;
-    hash_table1 hs(sz);
-    double_hash_table hs1(sz);
-    custom_hash_table hs2(sz);
+    hash_table1 hs(4*sz);
+    double_hash_table hs1(10*sz);
+    custom_hash_table hs2(10*sz);
     generator g1;
 
     vector < string > randString(sz);
@@ -524,65 +524,71 @@ int main()
 
     int col1 , col2 , col3;
     col1 = col2 = col3 = 0;
-
+    long long int result[2][3][2];
+    
     for(int i = 0; i < randString.size(); i++)
     {
         randString[i] = g1.next_string();
         value[i] = g1.get_val();
         hs.insert1(randString[i],value[i]);
-        col1 += hs.get_aux();
+        result[0][0][0] += hs.get_aux();
         hs1.insert1(randString[i],value[i]);
-        col2 += hs1.get_aux();
+        result[0][1][0] += hs1.get_aux();
 
         hs2.insert1(randString[i],value[i]);
-        col3 += hs2.get_aux();
+        result[0][2][0] += hs2.get_aux();
     }
 
-    cout << col1 << " " << col2 << " " << col3 << endl;
-
-    col1 = col2 = col3 = 0;
-
+    //cout << col1 << " " << col2 << " " << col3 << endl;
+    
     for(int i = 0; i < randString.size(); i++)
     {
         //randString[i] = g1.next_string();
         //value[i] = g1.get_val();
         hs.insert2(randString[i],value[i]);
-        col1 += hs.get_aux();
+        result[1][0][0] += hs.get_aux();
         hs1.insert2(randString[i],value[i]);
-        col2 += hs1.get_aux();
+        result[1][1][0] += hs1.get_aux();
 
         hs2.insert2(randString[i],value[i]);
-        col3 += hs2.get_aux();
+        result[1][2][0] += hs2.get_aux();
     }
-    cout << col1 << " " << col2 << " " << col3 << endl;
+    //cout << col11 << " " << col21 << " " << col31 << endl;
     
-    long long hit1 = 0, hit2 = 0;
     
     for(int i = 0; i < 1000; i++)
     {
         int id = rand() % sz;
         hs.search1(randString[id]);
-        hit1 += hs.get_aux();
+        result[0][0][1] += hs.get_aux();
         hs1.search1(randString[id]);
-        hit1 += hs1.get_aux();
+        result[0][1][1] += hs1.get_aux();
         hs2.search1(randString[id]);
-        hit1 += hs2.get_aux();
+        result[0][2][1] += hs2.get_aux();
        ///* /*
         hs.search2(randString[id]);
-        hit2 += hs.get_aux();
+        result[1][0][1] += hs.get_aux();
         
         hs1.search2(randString[id]);
-        hit2 += hs1.get_aux();
+        result[1][1][1] += hs1.get_aux();
         
         hs2.search2(randString[id]);
-        hit2 += hs2.get_aux();
+        result[1][2][1] += hs2.get_aux();
         //*/
         //*/
     }
     
-    double avg_h1 = 1.0 * hit1 / 1000, avg_h2 = 1.0 * hit2 / 1000;
-    cout << avg_h1 << " " << avg_h2 << endl;
+    cout << "                                       Hash1               " << endl;
     
+    cout << "Chaining Method : " << result[0][0][0] << " " << 1.0 * result[0][0][1] / 1000 << endl;
+    cout << "Double Hashing Method : " << result[0][1][0] << " " << 1.0 * result[0][1][1] / 1000 << endl;
+    cout << "custom hashing Method : " << result[0][2][0] << " " << 1.0 * result[0][2][1] / 1000 << endl;
+    
+    cout << "                                       Hash2               " << endl;
+    
+    cout << "Chaining Method : " << result[1][0][0] << " " << 1.0 * result[1][0][1] / 1000 << endl;
+    cout << "Double Hashing Method : " << result[1][1][0] << " " << 1.0 * result[1][1][1] / 1000 << endl;
+    cout << "custom hashing Method : " << result[1][2][0] << " " << 1.0 * result[1][2][1] / 1000 << endl;
     
     return 0;
 }
